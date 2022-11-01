@@ -20,7 +20,7 @@
 #' Default is \code{"pdf"}.
 #' @param palette Viridis color palette option for plots. Default is
 #' \code{"viridis"}. See
-#' \code{\link[viridisLite:viridis]{viridis}}
+#' \code{\link[viridis:viridis]{viridis}}
 #' for available options.
 #' @param text_size Text size for plot labels, axis labels etc. Default is
 #' \code{10}.
@@ -55,7 +55,7 @@
 #'
 #' \donttest{
 #' ## Compare technical replicates 1 vs. 2 for all samples
-#' corr_plot(raw_df, rep_1 = 1, rep_2 = 2, n_row = 3, n_col = 2)
+#' corr_plot(raw_df, rep_1 = 1, rep_2 = 2)
 #' }
 #'
 #' @return

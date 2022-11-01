@@ -11,10 +11,10 @@
 #' @import viridis
 #'
 #' @param raw_df A \code{raw_df} object (output from \code{\link{create_df}}).
-#' @param protein_range The range of proteins to plot. Default is \code{ALL},
-#' meaning all the proteins in the data frame.
-#' @param sample_range The range of samples to plot. Default is \code{ALL},
-#' meaning all the samples in the data frame.
+#' @param protein_range The range or subset of proteins (rows) to plot. If not
+#' provided, all the proteins (rows) in the data frame will be used.
+#' @param sample_range The range of samples to plot. If not
+#' provided, all the samples (columns) in the data frame will be used.
 #' @param reorder_x Logical. If \code{TRUE} samples on the x axis are reordered
 #' using the function given in \code{x_fun}. Default is \code{FALSE}.
 #' @param reorder_y Logical. If \code{TRUE} proteins in the y axis are reordered
@@ -25,10 +25,10 @@
 #' are \code{mean} and \code{sum}. Default is \code{mean}.
 #' @param palette Viridis color palette option for plots. Default is
 #' \code{"viridis"}. See
-#' \code{\link[viridisLite:viridis]{viridis}}
+#' \code{\link[viridis:viridis]{viridis}}
 #' for available options.
 #' @param label_proteins If \code{TRUE} proteins on the y axis
-#' will be labeled with their Majority Protein IDs. Defualt is \code{FALSE}.
+#' will be labeled with their Majority Protein IDs. Default is \code{FALSE}.
 #' @param text_size Text size for axis labels. Default is \code{10}.
 #' @param save Logical. If \code{TRUE} saves a copy of the plot in the
 #' directory provided in \code{file_path}.
@@ -408,7 +408,7 @@ impute_na <- function(raw_df,
 #' \code{10}.
 #' @param palette Viridis color palette option for plots. Default is
 #' \code{"viridis"}. See
-#' \code{\link[viridisLite:viridis]{viridis}}
+#' \code{\link[viridis:viridis]{viridis}}
 #' for available options.
 #' @param n_row Used if \code{global = FALSE} to indicate the number of rows
 #' to print the plots.

@@ -7,6 +7,12 @@
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/promor)](https://CRAN.R-project.org/package=promor)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/last-month/promor?color=blue)](https://r-pkg.org/pkg/promor)
+[![CRAN RStudio mirror
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/promor?color=blue)](https://r-pkg.org/pkg/promor)
 [![R-CMD-check](https://github.com/caranathunge/promor/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/caranathunge/promor/actions/workflows/R-CMD-check.yaml)
 [![test-coverage](https://github.com/caranathunge/promor/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/caranathunge/promor/actions/workflows/test-coverage.yaml)
 [![License: LGPL
@@ -20,8 +26,9 @@ v2.1](https://img.shields.io/badge/License-LGPL_v2.1-blue.svg)](https://www.gnu.
     **label-free quantification (LFQ)** proteomics data and building
     predictive models with top protein candidates.
 
--   `promor` provides a range of quality control and visualization tools
-    at the protein level to analyze label-free proteomics data.
+-   With `promor` we provide a range of quality control and
+    visualization tools to analyze label-free proteomics data at the
+    protein level.
 
 -   Input files for `promor` are the
     [proteinGroups.txt](https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt)
@@ -30,12 +37,21 @@ v2.1](https://img.shields.io/badge/License-LGPL_v2.1-blue.svg)](https://www.gnu.
     file, which contains the experimental design of your proteomics
     data.
 
+:rotating_light:**Check out our R Shiny app:** [PROMOR
+App](https://sgrbnf.shinyapps.io/PROMOR_App/)
+
 ------------------------------------------------------------------------
 
 ### Installation
 
-You can install the development version of promor from
-[GitHub](https://github.com/caranathunge/promor) with:
+Install the released version from CRAN
+
+``` r
+install.packages("promor")
+```
+
+Install development version from
+[GitHub](https://github.com/caranathunge/promor)
 
 ``` r
 # install devtools, if you haven't already:
@@ -142,6 +158,7 @@ covid_prob_list <- test_models(
 Let’s make ROC plots to check how the different models performed.
 
 ``` r
+
 roc_plot(
   probability_list = covid_prob_list,
   split_df = covid_split_df
@@ -169,7 +186,7 @@ vignette("intro_to_promor", package = "promor")
     technical
     replicates](https://caranathunge.github.io/promor/articles/promor_no_techreps.html)
 
-3.  If your data contains technical replicates: [promor: Technical
+3.  If your data contain technical replicates: [promor: Technical
     replicates](https://caranathunge.github.io/promor/articles/promor_with_techreps.html)
 
 4.  If you would like to use your proteomics data to build predictive
