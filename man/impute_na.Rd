@@ -5,7 +5,7 @@
 \title{Impute missing values}
 \usage{
 impute_na(
-  raw_df,
+  df,
   method = "minProb",
   tune_sigma = 1,
   q = 0.01,
@@ -16,8 +16,9 @@ impute_na(
 )
 }
 \arguments{
-\item{raw_df}{A \code{raw_df} object (output of \code{\link{create_df}})
-containing missing values.}
+\item{df}{A \code{raw_df} object (output of \code{\link{create_df}})
+containing missing values or a \code{norm_df} object after performing
+normalization.}
 
 \item{method}{Imputation method to use. Default is \code{"minProb"}.
 Available methods: \code{"minDet", "RF", "kNN", and "SVD"}.}
@@ -53,17 +54,20 @@ imputation method.
 \details{
 \itemize{\item Ideally, you should first remove proteins with
 high levels of missing data using the \code{filterbygroup_na} function
-before running \code{impute_na} on the \code{raw_df} object.
+before running \code{impute_na} on the \code{raw_df} object or the
+\code{norm_df} object.
 \item \code{impute_na} function imputes missing values using a
 user-specified imputation method from the available options, \code{minProb},
-\code{minDet}, \code{kNN}, \code{RF}, and \code{SVD}
+\code{minDet}, \code{kNN}, \code{RF}, and \code{SVD}.
+\item \strong{Note: Some imputation methods may require that the data be normalized
+prior to imputation.}
 \item Make sure to fix the random number seed with \code{seed} for reproducibility}.
 }
 \examples{
 ## Generate a raw_df object with default settings. No technical replicates.
 raw_df <- create_df(
-prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+  prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+  exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 )
 
 ## Impute missing values in the data frame using the default minProb
@@ -73,9 +77,11 @@ imp_df1 <- impute_na(raw_df, seed = 3312)
 \donttest{
 ## Impute using the RF method with the number of iterations set at 5
 ## and number of trees set at 100.
-imp_df2 <- impute_na(raw_df, method = "RF",
-maxiter = 5, ntree = 100,
-seed = 3312)
+imp_df2 <- impute_na(raw_df,
+  method = "RF",
+  maxiter = 5, ntree = 100,
+  seed = 3312
+)
 
 
 ## Using the kNN method.
@@ -88,6 +94,9 @@ imp_df4 <- impute_na(raw_df, method = "SVD", n_pcs = 3, seed = 3312)
 
 ## Using the minDet method with q set at 0.001.
 imp_df5 <- impute_na(raw_df, method = "minDet", q = 0.001, seed = 3312)
+
+## Impute a normalized data set using the kNN method
+imp_df6 <- impute_na(ecoli_norm_df, method = "kNN")
 
 }
 \references{

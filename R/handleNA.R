@@ -53,8 +53,8 @@
 #' @examples
 #' ## Generate a raw_df object with default settings. No technical replicates.
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 #' )
 #'
 #' ## Missing data heatmap with default settings.
@@ -100,19 +100,18 @@ heatmap_na <- function(raw_df,
                        plot_width = 15,
                        plot_height = 15,
                        dpi = 80) {
-
   # Binding global variables to the local function
   value <- protgroup <- NULL
 
-  #Assign all rows and columns if protein_range and sample_range aren't defined
+  # Assign all rows and columns if protein_range and sample_range aren't defined
   if (missing(protein_range)) {
-    protein_range = 1 : nrow(raw_df)
+    protein_range <- 1:nrow(raw_df)
   }
-  if(missing(sample_range)){
-    sample_range = 1 : ncol(raw_df)
+  if (missing(sample_range)) {
+    sample_range <- 1:ncol(raw_df)
   }
 
-    raw_df <- as.matrix(raw_df[protein_range, sample_range])
+  raw_df <- as.matrix(raw_df[protein_range, sample_range])
 
 
   # Convert the data into long format for plotting and make necessary changes
@@ -219,8 +218,8 @@ heatmap_na <- function(raw_df,
       )
   }
 
-  #Set temporary file_path if not specified
-  if(is.null(file_path)){
+  # Set temporary file_path if not specified
+  if (is.null(file_path)) {
     file_path <- tempdir()
   }
 
@@ -254,8 +253,9 @@ heatmap_na <- function(raw_df,
 #' @importFrom stats median
 #'
 #'
-#' @param raw_df A \code{raw_df} object (output of \code{\link{create_df}})
-#' containing missing values.
+#' @param df A \code{raw_df} object (output of \code{\link{create_df}})
+#' containing missing values or a \code{norm_df} object after performing
+#' normalization.
 #' @param method Imputation method to use. Default is \code{"minProb"}.
 #' Available methods: \code{"minDet", "RF", "kNN", and "SVD"}.
 #' @param tune_sigma A scalar used in the \code{"minProb"} method for
@@ -275,10 +275,13 @@ heatmap_na <- function(raw_df,
 #'
 #' @details \itemize{\item Ideally, you should first remove proteins with
 #' high levels of missing data using the \code{filterbygroup_na} function
-#' before running \code{impute_na} on the \code{raw_df} object.
+#' before running \code{impute_na} on the \code{raw_df} object or the
+#' \code{norm_df} object.
 #' \item \code{impute_na} function imputes missing values using a
 #' user-specified imputation method from the available options, \code{minProb},
-#' \code{minDet}, \code{kNN}, \code{RF}, and \code{SVD}
+#' \code{minDet}, \code{kNN}, \code{RF}, and \code{SVD}.
+#' \item **Note: Some imputation methods may require that the data be normalized
+#' prior to imputation.**
 #' \item Make sure to fix the random number seed with \code{seed} for reproducibility}.
 #'
 #' @seealso More information on the available imputation methods can be found
@@ -300,8 +303,8 @@ heatmap_na <- function(raw_df,
 #' @examples
 #' ## Generate a raw_df object with default settings. No technical replicates.
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 #' )
 #'
 #' ## Impute missing values in the data frame using the default minProb
@@ -311,9 +314,11 @@ heatmap_na <- function(raw_df,
 #' \donttest{
 #' ## Impute using the RF method with the number of iterations set at 5
 #' ## and number of trees set at 100.
-#' imp_df2 <- impute_na(raw_df, method = "RF",
-#' maxiter = 5, ntree = 100,
-#' seed = 3312)
+#' imp_df2 <- impute_na(raw_df,
+#'   method = "RF",
+#'   maxiter = 5, ntree = 100,
+#'   seed = 3312
+#' )
 #'
 #'
 #' ## Using the kNN method.
@@ -327,12 +332,15 @@ heatmap_na <- function(raw_df,
 #' ## Using the minDet method with q set at 0.001.
 #' imp_df5 <- impute_na(raw_df, method = "minDet", q = 0.001, seed = 3312)
 #'
+#' ## Impute a normalized data set using the kNN method
+#' imp_df6 <- impute_na(ecoli_norm_df, method = "kNN")
+#'
 #' @references Lazar, Cosmin, et al. "Accounting for the multiple natures of
 #' missing values in label-free quantitative proteomics data sets to compare
 #' imputation strategies." Journal of proteome research 15.4 (2016): 1116-1125.
 #'
 #' @export
-impute_na <- function(raw_df,
+impute_na <- function(df,
                       method = "minProb",
                       tune_sigma = 1,
                       q = 0.01,
@@ -340,7 +348,6 @@ impute_na <- function(raw_df,
                       ntree = 20,
                       n_pcs = 2,
                       seed = NULL) {
-
   # Setting global variables to NULL
   value <- protgroup <- NULL
 
@@ -348,13 +355,13 @@ impute_na <- function(raw_df,
 
   if (method == "minDet") {
     set.seed(seed)
-    df_imputed_mindet <- impute.MinDet(raw_df,
+    df_imputed_mindet <- impute.MinDet(df,
       q = q
     )
     return(df_imputed_mindet)
   } else if (method == "RF") {
     set.seed(seed)
-    df_imp_temp <- missForest::missForest(raw_df,
+    df_imp_temp <- missForest::missForest(df,
       maxiter = maxiter,
       ntree = ntree,
       verbose = TRUE
@@ -363,15 +370,15 @@ impute_na <- function(raw_df,
     return(df_imputed_rf)
   } else if (method == "kNN") {
     set.seed(seed)
-    df_imputed_knn <- VIM::kNN(raw_df, imp_var = FALSE)
-    rownames(df_imputed_knn) <- rownames(raw_df)
+    df_imputed_knn <- VIM::kNN(df, imp_var = FALSE)
+    rownames(df_imputed_knn) <- rownames(df)
     return(df_imputed_knn)
   } else if (method == "SVD") {
     set.seed(seed)
-    raw_df <- as.matrix(raw_df)
-    raw_df[is.nan(raw_df)] <- NA
+    df <- as.matrix(df)
+    df[is.nan(df)] <- NA
     df_imp_temp <- pcaMethods::pca(
-      object = raw_df,
+      object = df,
       method = "svdImpute",
       n_pcs = n_pcs,
       verbose = TRUE
@@ -380,7 +387,7 @@ impute_na <- function(raw_df,
     return(df_imputed_svd)
   } else if (method == "minProb") {
     set.seed(seed)
-    df_imputed_minprob <- impute.Min.Prob(raw_df,
+    df_imputed_minprob <- impute.Min.Prob(df,
       q = q,
       tune_sigma = tune_sigma
     )
@@ -399,8 +406,9 @@ impute_na <- function(raw_df,
 #' @import viridis
 #'
 #' @param original A \code{raw_df} object (output of \code{\link{create_df}})
-#' containing missing values.
-#' @param imputed An \code{imp.df} object obtained from running \code{impute_na}
+#' containing missing values or a \code{norm_df} object containing normalized
+#' protein intensity data.
+#' @param imputed An \code{imp_df} object obtained from running \code{impute_na}
 #'  on the same data frame provided as \code{original}.
 #' @param global Logical. If \code{TRUE} ({default}), a global density plot is
 #' produced. If \code{FALSE}, sample-wise density plots are produced.
@@ -427,10 +435,9 @@ impute_na <- function(raw_df,
 #'
 #' @details
 #' \itemize{\item Given two data frames, one with missing values
-#' (\code{raw_df} object) and the other, an imputed data frame
-#' (\code{imp_df} object) of the same data set, \code{impute_plot}
-#' generates global or sample-wise density plots to visualize the
-#' impact of imputation on the data set.
+#' and the other, an imputed data frame (\code{imp_df} object) of the same
+#' data set, \code{impute_plot} generates global or sample-wise density plots
+#' to visualize the impact of imputation on the data set.
 #' \item Note, when sample-wise option is selected (\code{global = FALSE}),
 #' \code{n_col} and \code{n_row} can be used to specify the number of columns
 #' and rows to print the plots.
@@ -444,8 +451,8 @@ impute_na <- function(raw_df,
 #'
 #' ## Generate a raw_df object with default settings. No technical replicates.
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 #' )
 #'
 #' ## Impute missing values in the data frame using the default minProb
@@ -477,7 +484,6 @@ impute_plot <- function(original,
                         plot_width = 7,
                         plot_height = 7,
                         dpi = 80) {
-
   # Set global variables to null
   value <- NULL
 
@@ -517,14 +523,15 @@ impute_plot <- function(original,
       dplot_data,
       ggplot2::aes(x = value)
     ) +
-      ggplot2::geom_density(ggplot2::aes(fill = factor(stage,
-        levels = c(
-          "Before imputation",
-          "After imputation"
-        )
-      )),
-      alpha = 0.7,
-      lwd = text_size * 0.02
+      ggplot2::geom_density(
+        ggplot2::aes(fill = factor(stage,
+          levels = c(
+            "Before imputation",
+            "After imputation"
+          )
+        )),
+        alpha = 0.7,
+        lwd = text_size * 0.02
       ) +
       ggplot2::xlab("Intensity") +
       ggplot2::ylab("Density") +
@@ -566,14 +573,15 @@ impute_plot <- function(original,
       dplot_data,
       ggplot2::aes(x = value)
     ) +
-      ggplot2::geom_density(ggplot2::aes(fill = factor(stage,
-        levels = c(
-          "Before imputation",
-          "After imputation"
-        )
-      )),
-      alpha = 0.7,
-      lwd = text_size * 0.02
+      ggplot2::geom_density(
+        ggplot2::aes(fill = factor(stage,
+          levels = c(
+            "Before imputation",
+            "After imputation"
+          )
+        )),
+        alpha = 0.7,
+        lwd = text_size * 0.02
       ) +
       ggplot2::xlab("Intensity") +
       ggplot2::ylab("Density") +
@@ -595,8 +603,8 @@ impute_plot <- function(original,
         strip.position = "top"
       )
 
-    #Set temporary file_path if not specified
-    if(is.null(file_path)){
+    # Set temporary file_path if not specified
+    if (is.null(file_path)) {
       file_path <- tempdir()
     }
 

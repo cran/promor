@@ -21,7 +21,7 @@ norm_plot(
 }
 \arguments{
 \item{original}{A \code{raw_df} object (output of \code{\link{create_df}})
-containing missing values, or ideally, an \code{imp_df} object after
+containing missing values, or an \code{imp_df} object after
 imputing the missing values with \code{impute_na}.}
 
 \item{normalized}{A \code{norm_df} object after normalizing the data frame
@@ -72,8 +72,8 @@ normalization on the protein intensity data.
 \donttest{
 ## Generate a raw_df object with default settings. No technical replicates.
 raw_df <- create_df(
-prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+  prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+  exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 )
 
 ## Impute missing values in the data frame using the default minProb

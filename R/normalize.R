@@ -5,8 +5,8 @@
 #' normalization method.
 #' @import limma
 #'
-#' @param imp_df An \code{imp_df} object with missing values imputed using
-#' \code{impute_na}.
+#' @param df An \code{imp_df} object with missing values imputed using
+#' \code{impute_na} or a \code{raw_df} object containing missing values.
 #' @param method Name of the normalization method to use. Choices are
 #' \code{"none", "scale", "quantile" or "cyclicloess."}
 #' Default is \code{"quantile."}
@@ -33,12 +33,12 @@
 #' @examples
 #' ## Generate a raw_df object with default settings. No technical replicates.
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 #' )
 #'
 #' ## Impute missing values in the data frame using the default minProb
-#' ## method.
+#' ## method prioir to normalization.
 #' imp_df <- impute_na(raw_df)
 #'
 #' ## Normalize the imp_df object using the default quantile method
@@ -47,11 +47,14 @@
 #' ## Use the cyclicloess method
 #' norm_df2 <- normalize_data(imp_df, method = "cyclicloess")
 #'
+#' ## Normalize data in the raw_df object prior to imputation.
+#' norm_df3 <- normalize_data(raw_df)
+#'
 #' @export
 
-normalize_data <- function(imp_df,
+normalize_data <- function(df,
                            method = "quantile") {
-  norm_df <- limma::normalizeBetweenArrays(imp_df,
+  norm_df <- limma::normalizeBetweenArrays(df,
     method = method
   )
 
@@ -69,7 +72,7 @@ normalize_data <- function(imp_df,
 
 
 #' @param original A \code{raw_df} object (output of \code{\link{create_df}})
-#' containing missing values, or ideally, an \code{imp_df} object after
+#' containing missing values, or an \code{imp_df} object after
 #' imputing the missing values with \code{impute_na}.
 #' @param normalized A \code{norm_df} object after normalizing the data frame
 #' provided as \code{original} using \code{normalize_data}.
@@ -108,8 +111,8 @@ normalize_data <- function(imp_df,
 #' \donttest{
 #' ## Generate a raw_df object with default settings. No technical replicates.
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 #' )
 #'
 #' ## Impute missing values in the data frame using the default minProb
@@ -139,7 +142,6 @@ norm_plot <- function(original,
                       dpi = 80,
                       plot_width = 10,
                       plot_height = 7) {
-
   # Set global variables to null
   intensity <- value <- group <- NULL
 
@@ -234,8 +236,8 @@ norm_plot <- function(original,
       )
   }
 
-  #Set temporary file_path if not specified
-  if(is.null(file_path)){
+  # Set temporary file_path if not specified
+  if (is.null(file_path)) {
     file_path <- tempdir()
   }
 

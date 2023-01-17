@@ -23,9 +23,10 @@ impute_plot(
 }
 \arguments{
 \item{original}{A \code{raw_df} object (output of \code{\link{create_df}})
-containing missing values.}
+containing missing values or a \code{norm_df} object containing normalized
+protein intensity data.}
 
-\item{imputed}{An \code{imp.df} object obtained from running \code{impute_na}
+\item{imputed}{An \code{imp_df} object obtained from running \code{impute_na}
 on the same data frame provided as \code{original}.}
 
 \item{global}{Logical. If \code{TRUE} ({default}), a global density plot is
@@ -71,10 +72,9 @@ missing data imputation on the data.
 }
 \details{
 \itemize{\item Given two data frames, one with missing values
-(\code{raw_df} object) and the other, an imputed data frame
-(\code{imp_df} object) of the same data set, \code{impute_plot}
-generates global or sample-wise density plots to visualize the
-impact of imputation on the data set.
+and the other, an imputed data frame (\code{imp_df} object) of the same
+data set, \code{impute_plot} generates global or sample-wise density plots
+to visualize the impact of imputation on the data set.
 \item Note, when sample-wise option is selected (\code{global = FALSE}),
 \code{n_col} and \code{n_row} can be used to specify the number of columns
 and rows to print the plots.
@@ -86,8 +86,8 @@ data frame.}
 
 ## Generate a raw_df object with default settings. No technical replicates.
 raw_df <- create_df(
-prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+  prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+  exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
 )
 
 ## Impute missing values in the data frame using the default minProb

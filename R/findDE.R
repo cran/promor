@@ -9,7 +9,7 @@
 #' @importFrom stats model.matrix
 #' @importFrom utils write.table
 #'
-#' @param norm_df A \code{norm_df} object.
+#' @param df A \code{norm_df} object or an \code{imp_df} object.
 #' @param save_output Logical. If \code{TRUE} saves results from the
 #' differential expression analysis in a text file labeled "limma_output.txt"
 #' in the directory specified by \code{file_path}.
@@ -64,7 +64,7 @@
 #' 43.7 (2015): e47-e47.
 #'
 #' @export
-find_dep <- function(norm_df,
+find_dep <- function(df,
                      save_output = FALSE,
                      save_tophits = FALSE,
                      file_path = NULL,
@@ -72,10 +72,9 @@ find_dep <- function(norm_df,
                      cutoff = 0.05,
                      lfc = 1,
                      n_top = 20) {
-
   # Extract group information from colnames
   group <- factor(c(sapply(
-    strsplit(colnames(norm_df), "_"),
+    strsplit(colnames(df), "_"),
     getElement, 1
   )))
 
@@ -83,7 +82,7 @@ find_dep <- function(norm_df,
   design <- model.matrix(~group)
 
   # Fit the model to the protein intensity data based on the experimental design
-  fit <- limma::lmFit(norm_df, design)
+  fit <- limma::lmFit(df, design)
   fit <- limma::eBayes(fit,
     robust = T,
     trend = T
@@ -95,15 +94,15 @@ find_dep <- function(norm_df,
     adjust.method = adj_method
   )
 
-  #Set temporary file_path if not specified
-  if(is.null(file_path)){
+  # Set temporary file_path if not specified
+  if (is.null(file_path)) {
     file_path <- tempdir()
   }
 
   # Write the results of the DE analysis to a text file (tab-separated)
   if (save_output == TRUE) {
     limma::write.fit(fit,
-      file = paste0(file_path,"/limma_outout.txt"),
+      file = paste0(file_path, "/limma_outout.txt"),
       adjust = adj_method,
       results = dec_test
     )
@@ -163,7 +162,7 @@ find_dep <- function(norm_df,
       )
     } else {
       write.table(results_de[1:n_top, ],
-                  file = paste0(file_path, "/TopHits.txt"),
+        file = paste0(file_path, "/TopHits.txt"),
         sep = "\t",
         quote = FALSE
       )
@@ -260,7 +259,6 @@ volcano_plot <- function(fit_df,
                          plot_height = 7,
                          plot_width = 7,
                          dpi = 80) {
-
   # Set global variables to NULL
   logFC <- P.Value <- dep <- de_ap <- NULL
 
@@ -365,8 +363,8 @@ volcano_plot <- function(fit_df,
       )
   }
 
-  #Set temporary file_path if not specified
-  if(is.null(file_path)){
+  # Set temporary file_path if not specified
+  if (is.null(file_path)) {
     file_path <- tempdir()
   }
 
@@ -397,8 +395,8 @@ volcano_plot <- function(fit_df,
 #' @import viridis
 #'
 #' @param fit_df A \code{fit_df} object from performing \code{find_dep}.
-#' @param norm_df The \code{norm_df} object from which the \code{fit_df} object
-#' was obtained.
+#' @param df The \code{norm_df} object or the \code{imp_df} object from which
+#' the \code{fit_df} object was obtained.
 #' @param adj_method Method used for adjusting the p-values for multiple
 #' testing. Default is \code{"BH"}.
 #' @param cutoff Cutoff value for p-values and adjusted p-values. Default is
@@ -439,7 +437,7 @@ volcano_plot <- function(fit_df,
 #'
 #' ## Build a heatmap of differentially expressed proteins using the provided
 #' ## example fit_df and norm_df data objects
-#' heatmap_de(fit_df = covid_fit_df, norm_df = covid_norm_df)
+#' heatmap_de(covid_fit_df, covid_norm_df)
 #'
 #' ## Create a heatmap with P-value of 0.05 and log fold change of 1 as
 #' ## significance criteria.
@@ -454,7 +452,7 @@ volcano_plot <- function(fit_df,
 #'
 #' @export
 heatmap_de <- function(fit_df,
-                       norm_df,
+                       df,
                        adj_method = "BH",
                        cutoff = 0.05,
                        lfc = 1,
@@ -469,9 +467,11 @@ heatmap_de <- function(fit_df,
                        dpi = 80,
                        plot_height = 7,
                        plot_width = 7) {
-
   # Binding the global variables to a local function
   logFC <- P.Value <- adj.P.Val <- intensity <- protein <- NULL
+
+  # convert norm_df or imp_df object into a matrix
+  norm_df <- as.matrix(df)
 
   # Extract the required data from the fit object
   exp_de <- limma::topTable(fit_df,
@@ -504,7 +504,6 @@ heatmap_de <- function(fit_df,
     stop(message
     (paste0("No significant proteins found at ", sig, " < ", cutoff, ".")))
   } else {
-
     # Extract intensity values for top proteins based on logFC and p-val cutoff
     top_intensity <- subset(norm_df,
       rownames(norm_df) %in% top_proteins,
@@ -580,8 +579,8 @@ heatmap_de <- function(fit_df,
       ) +
       ggplot2::facet_grid(. ~ stage, scales = "free")
 
-    #Set temporary file_path if not specified
-    if(is.null(file_path)){
+    # Set temporary file_path if not specified
+    if (is.null(file_path)) {
       file_path <- tempdir()
     }
 

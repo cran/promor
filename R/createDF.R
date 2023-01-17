@@ -1,24 +1,36 @@
-# Create data frame with LFQ intensities ----------------------------------
+# Create data frame with protein intensities ----------------------------------
 #' Create a data frame of protein intensities
-#' @description This function creates a data frame of label-free quantitative
-#' (LFQ) protein intensities from MaxQuant's proteinGroups.txt file.
+#' @description This function creates a data frame of protein intensities
 #'
 #' @author Chathurani Ranathunge
 #'
 #' @importFrom utils read.csv
 #'
-#' @param prot_groups File path to proteinGroups.txt file produced by MaxQuant.
+#' @param prot_groups File path to a proteinGroups.txt file produced by MaxQuant
+#' or a standard input file containing a quantitative matrix
+#' where the proteins or protein groups are indicated by rows and the
+#' samples by columns.
 #' @param exp_design File path to a text file containing the experimental
 #' design.
+#' @param input_type Type of input file indicated by \code{prot_groups}.
+#' Available options are: "MaxQuant", if a proteinGroups.txt file is used, or
+#' "standard" if a standard input file is used. Default is "MaxQuant."
+#' @param data_type Type of sample protein intensity data columns to use from
+#' the proteinGroups.txt file. Some available options are "LFQ", "iBAQ",
+#' "Intensity". Default is "LFQ." User-defined prefixes in the proteinGroups.txt
+#' file are also allowed. The \code{data_type} argument is case-sensitive, and
+#' only applies when \code{input_type = "MaxQuant"}.
 #' @param filter_na Logical. If \code{TRUE}(default), filters out empty rows and
 #' columns from the data frame.
 #' @param filter_prot Logical. If \code{TRUE} (default), filters out
 #' reverse proteins, proteins only identified by site, potential contaminants,
 #' and proteins identified with less than the minimum number of unique peptides
-#' indicated by \code{uniq_pep}.
+#' indicated by \code{uniq_pep}. Only applies when
+#' \code{input_type = "MaxQuant"}.
 #' @param uniq_pep Numerical. The minimum number of unique peptides required to
 #' identify a protein (default is 2). Proteins that are identified by less than
-#' this number of unique peptides are filtered out.
+#' this number of unique peptides are filtered out. only applies when
+#' \code{input_type = "MaxQuant"}.
 #' @param tech_reps Logical. Indicate as \code{TRUE} if technical replicates
 #' are present in the data. Default is \code{FALSE}.
 #' @param zero_na Logical. If \code{TRUE} (default), zeros are considered
@@ -29,50 +41,76 @@
 #'
 #' @details
 #' \itemize{\item This function first reads in the proteinGroups.txt file
-#' produced by MaxQuant.
+#' produced by MaxQuant or a standard input file containing a quantitative
+#' matrix where the proteins or protein groups are indicated by rows and the
+#' samples by columns.
 #' \item It then reads in the expDesign.txt file provided as
 #' \code{exp_design} and extracts relevant information from it to add to the
-#' data frame.
+#' data frame. an example of the expDesign.txt is provided here:
+#' \url{https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt}.
 #' \item First, empty rows and columns are removed from the data frame.
-#' \item Next, it filters out reverse proteins, proteins that were
-#' only identified by site, and potential contaminants.
-#' \item Then it removes proteins identified with less than
+#' \item Next, if a proteinGroups.txt file is used, it filters out reverse
+#' proteins, proteins that were only identified by site, and potential
+#' contaminants.Then it removes proteins identified with less than
 #' the number of unique peptides indicated by \code{uniq_pep} from the
 #' data frame.
-#' \item Next, it extracts the LFQ intensity columns and the selected protein
-#' rows from the data  frame.
+#' \item Next, it extracts the intensity columns indicated by \code{data type}
+#' and the selected protein rows from the data frame.
 #' \item Converts missing values (zeros) to NAs.
-#' \item Finally, the function log transforms the LFQ intensity values.}
+#' \item Finally, the function log transforms the intensity values.}
 #'
-#' @return A \code{raw_df} object which is a data frame containing selected
-#' proteins as rows and sample LFQ intensities as columns.
+#' @return A \code{raw_df} object which is a data frame containing protein
+#' intensities. Proteins or protein groups are indicated by rows and samples
+#' by columns.
 #'
 #' @examples
 #' \donttest{
+#'
+#' ### Using a proteinGroups.txt file produced by MaxQuant as input.
 #' ## Generate a raw_df object with default settings. No technical replicates.
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt"
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt",
+#'   input_type = "MaxQuant"
 #' )
 #'
 #' ## Data containing technical replicates
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg2.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed2.txt",
-#' tech_reps = TRUE
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg2.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed2.txt",
+#'   input_type = "MaxQuant",
+#'   tech_reps = TRUE
 #' )
 #'
 #' ## Alter the number of unique peptides needed to retain a protein
 #' raw_df <- create_df(
-#' prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
-#' exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt",
-#' uniq_pep = 1
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt",
+#'   input_type = "MaxQuant",
+#'   uniq_pep = 1
+#' )
+#'
+#' ## Use "iBAQ" values instead of "LFQ" values
+#' raw_df <- create_df(
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/pg1.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt",
+#'   input_type = "MaxQuant",
+#'   data_type = "iBAQ"
+#' )
+#'
+#' ### Using a universal standard input file instead of MaxQuant output.
+#' raw_df <- create_df(
+#'   prot_groups = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/st.txt",
+#'   exp_design = "https://raw.githubusercontent.com/caranathunge/promor_example_data/main/ed1.txt",
+#'   input_type = "standard"
 #' )
 #' }
 #' @export
 
 create_df <- function(prot_groups,
                       exp_design,
+                      input_type = "MaxQuant",
+                      data_type = "LFQ",
                       filter_na = TRUE,
                       filter_prot = TRUE,
                       uniq_pep = 2,
@@ -92,6 +130,13 @@ create_df <- function(prot_groups,
     stringsAsFactors = FALSE,
     sep = "\t"
   )
+
+  # convert data type to lowercase
+  input_type <- tolower(input_type)
+
+  # check if the correct input type was entered
+  stopifnot("input_type not recognized." = input_type == "maxquant" || input_type == "standard")
+
 
   if (tech_reps == TRUE) {
     # if tech_reps == TRUE, combine all columns to make new sample label
@@ -135,87 +180,113 @@ create_df <- function(prot_groups,
   # Get number of rows in the df
   orig_rows_1 <- nrow(df)
 
-  if (filter_prot == TRUE) {
-    if ("Only.identified.by.site" %in% colnames(df)) {
-      df <- subset(
-        df,
-        df$Only.identified.by.site != "+"
-      )
-      message(paste0(
-        orig_rows_1 - nrow(df),
-        " protein(s) (rows) only identified by site removed."
-      ))
+  if (input_type == "maxquant") {
+    # check if the data type is found in the prot_groups file
+    stopifnot("data_type not found in prot_groups." = any(grepl(data_type, colnames(df))))
+
+    if (filter_prot == TRUE) {
+      if ("Only.identified.by.site" %in% colnames(df)) {
+        df <- subset(
+          df,
+          df$Only.identified.by.site != "+"
+        )
+        message(paste0(
+          orig_rows_1 - nrow(df),
+          " protein(s) (rows) only identified by site removed."
+        ))
+      }
+
+      # get number of rows
+      orig_rows_2 <- nrow(df)
+
+      if ("Reverse" %in% colnames(df)) {
+        df <- subset(
+          df,
+          df$Reverse != "+"
+        )
+        message(paste0(
+          orig_rows_2 - nrow(df),
+          " reverse protein(s) (rows) removed."
+        ))
+      }
+
+      # get number of rows
+      orig_rows_3 <- nrow(df)
+
+      if ("Potential.contaminant" %in% colnames(df)) {
+        df <- subset(
+          df,
+          df$Potential.contaminant != "+"
+        )
+        message(paste0(
+          orig_rows_3 - nrow(df),
+          " protein potential contaminant(s) (rows) removed."
+        ))
+      }
+
+      if ("Contaminant" %in% colnames(df)) {
+        df <- subset(
+          df,
+          df$Contaminant != "+"
+        )
+        message(paste0(
+          orig_rows_3 - nrow(df),
+          " protein contaminant(s) (rows) removed."
+        ))
+      }
+
+      # get number of rows
+      orig_rows_4 <- nrow(df)
+
+      if ("Unique.peptides" %in% colnames(df)) {
+        df <- subset(
+          df,
+          df$Unique.peptides > uniq_pep
+        )
+        message(paste0(
+          orig_rows_4 - nrow(df), " protein(s) identified by ",
+          uniq_pep, " or fewer unique peptides removed."
+        ))
+      }
+    } else {
+      warning("Proteins have not been filtered")
     }
 
-    # get number of rows
-    orig_rows_2 <- nrow(df)
+    # Extract majority protein group names
+    maj_proteins <- df$Majority.protein.IDs
 
-    if ("Reverse" %in% colnames(df)) {
-      df <- subset(
-        df,
-        df$Reverse != "+"
-      )
-      message(paste0(
-        orig_rows_2 - nrow(df),
-        " reverse protein(s) (rows) removed."
-      ))
+    if (data_type == "LFQ") {
+      pattern <- paste0(data_type, ".", "intensity", ".", collapse = "")
+    } else {
+      pattern <- paste0(data_type, ".", collapse = "")
     }
 
-    # get number of rows
-    orig_rows_3 <- nrow(df)
+    # Subset the data frame to only include the data_type columns
+    samples <- df[, grepl(pattern, colnames(df))]
 
-    if ("Potential.contaminant" %in% colnames(df)) {
-      df <- subset(
-        df,
-        df$Potential.contaminant != "+"
-      )
-      message(paste0(
-        orig_rows_3 - nrow(df),
-        " protein potential contaminant(s) (rows) removed."
-      ))
-    }
+    # order dataframe columns by column name. Important for next steps involving
+    # mapply.
+    samples <- samples[, order(colnames(samples))]
+    df <- as.matrix(samples)
 
-    if ("Contaminant" %in% colnames(df)) {
-      df <- subset(
-        df,
-        df$Contaminant != "+"
-      )
-      message(paste0(
-        orig_rows_3 - nrow(df),
-        " protein contaminant(s) (rows) removed."
-      ))
-    }
-
-    # get number of rows
-    orig_rows_4 <- nrow(df)
-
-    if ("Unique.peptides" %in% colnames(df)) {
-      df <- subset(
-        df,
-        df$Unique.peptides > uniq_pep
-      )
-      message(paste0(
-        orig_rows_4 - nrow(df), " protein(s) identified by ",
-        uniq_pep, " or fewer unique peptides removed."
-      ))
-    }
-  } else {
-    warning("Proteins have not been filtered")
+    # remove data_type part from the column name
+    raw_col <- gsub(pattern, "", colnames(df))
   }
 
-  # Extract majority protein group names
-  maj_proteins <- df$Majority.protein.IDs
+  # If a standard table input is used
+  if (input_type == "standard") {
+    # Extract maj.protein names from the first column
+    maj_proteins <- df[, 1]
 
-  # Subset the data frame to only include the LFQ.intensity columns
-  samples <- df[, grepl("LFQ.intensity", names(df))]
+    # Extract sample names from the column names
+    raw_col <- colnames(df)[-1]
 
-  # order dataframe columns by column name. Important for next steps involving
-  # mapply.
-  samples <- samples[, order(names(samples))]
-  df <- as.matrix(samples)
+    # Create a matrix of intensities, remove the first column
+    new_df <- df[, -1]
+    df <- as.matrix(new_df)
+  }
 
-  # remove LFQ intensity part from the column name
-  raw_col <- gsub("LFQ.intensity.", "", colnames(df))
+
 
   # sort the design table by mq_label so that the order matches to that of
   # raw_col
@@ -241,6 +312,7 @@ create_df <- function(prot_groups,
     # Convert matrix to dataframe and convert zeros to NAs
     df <- as.data.frame(df)
     df[df == 0] <- NA
+    message("Zeros have been replaced with NAs.")
   } else {
     warning("Zeros have not been converted to NAs in the data frame")
   }
@@ -248,6 +320,7 @@ create_df <- function(prot_groups,
   # log2 transform the data
   if (log_tr == TRUE) {
     df <- log(df, base)
+    message("Data have been log-transformed.")
   } else {
     warning("Intensities have not been log transformed")
   }
