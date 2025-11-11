@@ -1,4 +1,4 @@
-## ---- echo = FALSE, out.width = "100%"----------------------------------------
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
 knitr::include_graphics("../man/figures/promor_ProtAnalysisFlowChart_small.png")
 
 ## ----example, results = 'hide', warning=FALSE, eval = FALSE-------------------
@@ -26,7 +26,7 @@ knitr::include_graphics("../man/figures/promor_ProtAnalysisFlowChart_small.png")
 ## ----volcanoplot, warning = FALSE,  dpi = 300, out.width = '70%', fig.align ='center', eval = FALSE----
 #  volcano_plot(fit_df, text_size = 5)
 
-## ---- echo = FALSE, out.width = "100%"----------------------------------------
+## ----echo = FALSE, out.width = "100%"-----------------------------------------
 knitr::include_graphics("../man/figures/promor_ProtModelingFlowChart_small.png")
 
 ## ----modeling_example, results = 'hide', warning = FALSE,message = F, eval = FALSE----
