@@ -1,7 +1,7 @@
 Package: promor
 Type: Package
 Title: Proteomics Data Analysis and Modeling Tools
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: person(given = "Chathurani",
            family = "Ranathunge",
            role = c("aut", "cre", "cph"),
@@ -25,9 +25,9 @@ LazyData: true
 Config/testthat/edition: 3
 BugReports: https://github.com/caranathunge/promor/issues
 NeedsCompilation: no
-Packaged: 2025-11-11 16:52:29 UTC; caran
+Packaged: 2026-05-07 07:32:06 UTC; caran
 Author: Chathurani Ranathunge [aut, cre, cph] (ORCID:
     <https://orcid.org/0000-0003-1901-2119>)
 Maintainer: Chathurani Ranathunge <caranathunge86@gmail.com>
 Repository: CRAN
-Date/Publication: 2025-11-11 22:20:02 UTC
+Date/Publication: 2026-05-07 08:00:09 UTC

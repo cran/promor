@@ -1,6 +1,6 @@
-e6efb6827e8b25aeed95d10d954a45a0 *DESCRIPTION
+33a3e8d4cf29a4fe83aa4950bbecf23d *DESCRIPTION
 2fba6f85926074e725ff465c6bdae1c0 *NAMESPACE
-115016550ab3cd03710b5feba2a84f9c *NEWS.md
+c8fe72ed6ccde94c3d686981f6c53609 *NEWS.md
 a9e1b44d97d4f79b4dae9390e02860af *R/createDF.R
 a79f5f3035f398ba2717d4ac6c19c818 *R/data.R
 05bdd7a3535e32fc7cfa408ef1d50fae *R/filterProteins.R
@@ -58,7 +58,7 @@ f1be125b46499ea3c4947b8c46261a90 *man/train_models.Rd
 a32d12e820c38d1815eaa4b160790970 *man/varimp_plot.Rd
 b56edb973439674c1b01159858d487eb *man/volcano_plot.Rd
 0f6f93df30e63b92616678c29e47a6bd *tests/testthat.R
-7a01e27895e56e78062ca64fe5a0e27e *tests/testthat/test-protein_analysis.R
+dc5c71684b3638ecc82626ca911ed096 *tests/testthat/test-protein_analysis.R
 f7510fabb8c701542add534f4cb6b723 *tests/testthat/test-protein_modeling.R
 5f17521b2819507b4ee27e2bba01da70 *tests/testthat/testdata/fake_fit.RDS
 867dfb47aa17464a54e48e852026b6bd *tests/testthat/testdata/fake_fit_df.rds
